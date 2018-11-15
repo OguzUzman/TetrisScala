@@ -16,7 +16,7 @@ class Piece {
   def x_(newX:Int):Unit = _x = newX
   def y_(newY:Int):Unit = _y = newY
 
-  def yx_ (y:Int, x:Int) :Unit = {y_(y); x_(x)}
+  def yx_ (y:Int, x:Int) :Piece = {y_(y); x_(x); this}
 
 
   /**
@@ -24,21 +24,17 @@ class Piece {
     * @return
     */
   def rotate:Piece={
-    new Piece().setState(rotate90(state))
+    new Piece().setState(rotateCounter90(state)).yx_(y, x)
   }
 
-  // transpose and rotate90 are taken from https://gist.github.com/polyglotpiglet/6d10d7b69ecdbe5da5e4
+  //
   /**
-    * Simple matrix transpose
+    * Matrix counter clockwise rotation
     * @param matrix
     * @return
     */
-  private def transpose(matrix: Array[Array[Int]]): Array[Array[Int]] = {
-    matrix.head.indices.map(i => matrix.map(_(i))).toArray
-  }
-
-  private def rotate90(matrix: Array[Array[Int]]): Array[Array[Int]] = {
-    transpose(matrix).map(_.reverse)
+  private def rotateCounter90(matrix: Array[Array[Int]]): Array[Array[Int]] = {
+    matrix.map(_.reverse).transpose
   }
 
   var state: Array[Array[Int]] = _
@@ -53,6 +49,13 @@ class Piece {
     this
   }
 
+  /**
+    *
+    * @return the last horizontal which there is a cube
+    */
+  def maxHorizontal: Int = {
+    0
+  }
 
 
   /**
@@ -70,19 +73,24 @@ class Piece {
     }
   }
 
+  override def equals(other: Any): Boolean =
+    other.asInstanceOf[Piece].state.
+      zip(this.state).
+      forall((tuple: (Array[Int], Array[Int])) => tuple._1.sameElements(tuple._2))
 }
 
-object RandomPieceGenerator{
+
+object PieceGenerator{
+
   val random =new Random()
 
   /**
     * Returns a random piece; selection is uniform
     * @return
     */
-  def getNew(): Piece ={
+  def getRandom(): Piece =
       List(new Line(), new Square(), new TheT(), new LeftL(), new RightL(), new DogLeft(), new DogRight())(random.nextInt(7))
 
-  }
 }
 
 class Line extends Piece{

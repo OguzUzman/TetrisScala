@@ -53,6 +53,7 @@ class GameUI(val height:Int, val width:Int) extends SimpleSwingApplication{
         case KeyTyped(_, 's', _, _) => gameLogic.down
         case KeyTyped(_, 'a', _, _) => gameLogic.left
         case KeyTyped(_, 'e', _, _) => gameLogic.rotate
+        case KeyTyped(_, ' ', _, _) => gameLogic.drop
       }
       contents += canvas
       focusable = true

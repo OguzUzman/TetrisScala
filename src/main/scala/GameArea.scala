@@ -11,8 +11,7 @@ class GameArea(val height:Int, val width:Int) {
     * Random piece at the top of the board horizontally center
     */
   def newPiece={
-    piece = RandomPieceGenerator.getNew()
-    pieceLocation = (0, (width-piece.size())/2)
+    piece = PieceGenerator.getRandom().yx_(0, (width-2)/2)
   }
   /**
     * Fixes the piece onto the board.
@@ -20,9 +19,9 @@ class GameArea(val height:Int, val width:Int) {
   def fix={
     var copyMap = board.clone()
     for (j <- 0 until piece.size; i <- 0 until piece.size){
-      if (pieceLocation._1+j<height && pieceLocation._2+i<width && 0<=pieceLocation._1+j &&  0<=pieceLocation._2+i) {
-        if (board(pieceLocation._1 + j)(pieceLocation._2 + i) == 1 || piece.get(j, i) == 1) {
-          copyMap(pieceLocation._1 + j)(pieceLocation._2 + i) = 1
+      if (piece.y+j<height && piece.x+i<width && 0<=piece.y+j &&  0<=piece.x+i) {
+        if (board(piece.y + j)(piece.x + i) == 1 || piece.get(j, i) == 1) {
+          copyMap(piece.y + j)(piece.x + i) = 1
         }
       }
     }
@@ -61,7 +60,7 @@ class GameArea(val height:Int, val width:Int) {
           return false
         if (newY >= height)
           return false
-        if(board(pieceLocation._1+j+yShift)(pieceLocation._2+i+xShift)==1){
+        if(board(piece.y+j+yShift)(piece.x+i+xShift)==1){
           return false
         }
       }
@@ -69,16 +68,18 @@ class GameArea(val height:Int, val width:Int) {
     true
   }
 
-  def stateAllowed(piece: Piece, )
+  //def stateAllowed(piece: Piece)
 
   /**
     * Move y vertically, x horizontally
-    * @param y
-    * @param x
+    * @param yShift
+    * @param xShift
     */
-  def movePiece(y:Int,x:Int)={
-    pieceLocation=(pieceLocation._1 + y, pieceLocation._2 + x):(Int, Int)
+  def movePiece(yShift:Int, xShift:Int)={
+    piece.yx_(piece.y + yShift, piece.x + xShift)
   }
+
+
 
   /**
     * If rotation is allowed, piece is rotated
@@ -90,8 +91,9 @@ class GameArea(val height:Int, val width:Int) {
     // Check each cube of piece if it would collide with an existing cube or outside the boundary
     for (j <- 0 until rotatedPiece.size; i <- 0 until rotatedPiece.size){
       if(rotatedPiece.get(j,i)==1){
-        if(pieceLocation._1+j<0 || pieceLocation._2+i<0 || pieceLocation._1+j>=height ||
-          pieceLocation._2+i>=width || board(pieceLocation._1+j)(pieceLocation._2+i)==1){
+        val x = piece.x+i
+        val y = piece.y+j
+        if(y<0 || x<0 || y>=height ||x>=width || get(y, x)==1){
           return false
         }
       }
@@ -109,9 +111,9 @@ class GameArea(val height:Int, val width:Int) {
   def get(y:Int, x:Int):Int={
 
     try {
-      if ((pieceLocation._1 until (pieceLocation._1 + piece.size()) contains y) &&
-        (pieceLocation._2 until (pieceLocation._2 + piece.size()) contains x)) {
-        if (piece.get(y - pieceLocation._1, x - pieceLocation._2) == 1) {
+      if ((piece.y until (piece.y + piece.size()) contains y) &&
+        (piece.x until (piece.x + piece.size()) contains x)) {
+        if (piece.get(y - piece.y, x - piece.x) == 1) {
           return 2
         }
       }

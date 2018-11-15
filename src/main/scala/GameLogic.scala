@@ -53,6 +53,15 @@ class GameLogic(val height:Int, val width:Int) {
     }
   }
 
+  def drop:Unit = {
+    while (board.shiftAllowed(1, 0)){
+      board.movePiece(1, 0)
+      gameUI.updateCanvas(board)
+    }
+    board.fix
+    pieceExists = false
+  }
+
 
   /**
     * Ran when 'e' is pressed, commands the piece to rotate if possible
