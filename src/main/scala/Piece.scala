@@ -49,14 +49,6 @@ class Piece {
     this
   }
 
-  /**
-    *
-    * @return the last horizontal which there is a cube
-    */
-  def maxHorizontal: Int = {
-    0
-  }
-
 
   /**
     * Checks if the yth vertically, xth horizontally is occupied
@@ -77,6 +69,10 @@ class Piece {
     other.asInstanceOf[Piece].state.
       zip(this.state).
       forall((tuple: (Array[Int], Array[Int])) => tuple._1.sameElements(tuple._2))
+
+
+  override def toString = state.map((row: Array[Int]) => row.mkString(" ")).mkString("\n")
+
 }
 
 
@@ -89,11 +85,11 @@ object PieceGenerator{
     * @return
     */
   def getRandom(): Piece =
-      List(new Line(), new Square(), new TheT(), new LeftL(), new RightL(), new DogLeft(), new DogRight())(random.nextInt(7))
+      List(new Stick(), new Square(), new T(), new LeftL(), new RightL(), new DogLeft(), new DogRight())(random.nextInt(7))
 
 }
 
-class Line extends Piece{
+class Stick extends Piece{
 
   state = Array(
     Array(0, 1, 0, 0),
@@ -110,7 +106,7 @@ class Square extends Piece{
   )
 }
 
-class TheT extends Piece{
+class T extends Piece{
   state = Array(
     Array(0, 0, 0),
     Array(0, 1, 0),
@@ -136,8 +132,8 @@ class RightL extends Piece{
 
 class DogLeft extends Piece{
   state = Array(
-    Array(0, 1, 1),
     Array(1, 1, 0),
+    Array(0, 1, 1),
     Array(0, 0, 0)
   )
 }
@@ -145,8 +141,8 @@ class DogLeft extends Piece{
 class DogRight extends Piece{
 
   state = Array(
-    Array(1, 1, 0),
     Array(0, 1, 1),
+    Array(1, 1, 0),
     Array(0, 0, 0)
   )
 }

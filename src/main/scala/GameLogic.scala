@@ -71,7 +71,7 @@ class GameLogic(val height:Int, val width:Int) {
   var pieceExists=false
 
   /**
-    * Main game loop content
+    * Main game loop contentm
     */
   def tick = {
     if(!pieceExists){

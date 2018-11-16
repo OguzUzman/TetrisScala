@@ -22,3 +22,6 @@ libraryDependencies := {
       libraryDependencies.value :+ "org.scala-lang" % "scala-swing" % scalaVersion.value
   }
 }
+
+libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.1"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test"
