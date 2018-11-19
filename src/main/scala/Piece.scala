@@ -9,12 +9,14 @@ class Piece {
 
   private var _x=0
   private var _y=0
+  var state: Array[Array[Int]] = _
 
   def x:Int = _x
   def y:Int = _y
 
-  def x_(newX:Int):Unit = _x = newX
-  def y_(newY:Int):Unit = _y = newY
+  def x_(newX:Int):Piece = {_x = newX;this}
+  def y_(newY:Int):Unit ={_y = newY;this}
+
 
   def yx_ (y:Int, x:Int) :Piece = {y_(y); x_(x); this}
 
@@ -37,7 +39,6 @@ class Piece {
     matrix.map(_.reverse).transpose
   }
 
-  var state: Array[Array[Int]] = _
 
   /**
     * Sets the new configuration of the piece; called after rotation.
@@ -71,8 +72,18 @@ class Piece {
       forall((tuple: (Array[Int], Array[Int])) => tuple._1.sameElements(tuple._2))
 
 
-  override def toString = state.map((row: Array[Int]) => row.mkString(" ")).mkString("\n")
+  override def toString =
+    "_"*(state.length+2) +"\n" +
+      state.map((row: Array[Int]) => "|"+row.map((i:Int)=>if (i == 1) '\u25A0' else " ").mkString("")+"|").mkString("\n")+
+      "\n"+ "‾"*(state.length+2)
 
+  override def clone(): Piece = {
+    val copyElement = new Piece
+    copyElement.state = state.map(_.clone)
+    copyElement._x = x
+    copyElement._y = y
+    copyElement
+  }
 }
 
 
