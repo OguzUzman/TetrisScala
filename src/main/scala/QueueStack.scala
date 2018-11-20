@@ -23,11 +23,13 @@ class QueueStack[StackClass](val maxSize:Int) {
       discardLast
       last
     } else {
-      throw new ArrayIndexOutOfBoundsException("The stack is empty.")
+      throw new ArrayIndexOutOfBoundsException("Empty stack")
     }
   }
 
-  def isEmpty = stack.isEmpty
+  def isEmpty:Boolean = stack.isEmpty
+
+  def nonEmpty:Boolean= !isEmpty
 
   def flush = {stack = List()}
 }

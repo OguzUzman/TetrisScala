@@ -2,6 +2,7 @@ import scala.util.Random
 
 /**
   * Created by oguz on 31.10.2018.
+  *
   */
 class Piece {
 
@@ -15,14 +16,14 @@ class Piece {
   def y:Int = _y
 
   def x_(newX:Int):Piece = {_x = newX;this}
-  def y_(newY:Int):Unit ={_y = newY;this}
+  def y_(newY:Int):Piece ={_y = newY;this}
 
-
-  def yx_ (y:Int, x:Int) :Piece = {y_(y); x_(x); this}
+  def yx_(y:Int, x:Int):Piece = {y_(y); x_(x); this}
 
 
   /**
-    * Rotates the piece if allowed
+    * Rotates the piece if allowed.
+    * We use the Super Rotation System found in https://strategywiki.org/wiki/Tetris/Rotation_systems
     * @return
     */
   def rotate:Piece={

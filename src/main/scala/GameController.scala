@@ -12,10 +12,11 @@ class GameController(val height:Int, val width:Int) extends GameControlListener{
 
   private var task:java.util.TimerTask = _
 
-  initBoard()
+  GlobalReactors.addGameControlListener(this)
+  initBoard
 
 
-  def initBoard()={
+  private def initBoard()={
     board = new GameBoard(height, width)
     pieceExists = false
     t = new java.util.Timer()
@@ -26,7 +27,7 @@ class GameController(val height:Int, val width:Int) extends GameControlListener{
   /**
     * Main game loop contentm
     */
-  def tick = {
+  private def tick = {
     if(!board.pieceExists) board.newRandomPiece else down
     if (board.isGameOver){
       println("GAME OVER!!!")
@@ -38,17 +39,18 @@ class GameController(val height:Int, val width:Int) extends GameControlListener{
   /**
     * Trigger the game loop
     */
-  def start = {
+  def start():Unit = {
     new Thread(() => {
-      t.schedule(task, 1000, 200)
+      t.schedule(task, 0, 200)
     }).start
   }
 
-  def newGame ={
+  override def newGame:Unit ={
     t.cancel()
     task.cancel()
     initBoard()
-    start
+    start()
+    board.gameBoardChanged
   }
 
 
@@ -72,11 +74,21 @@ class GameController(val height:Int, val width:Int) extends GameControlListener{
 object GameController{
   /**
     * Starts the game
-    * @param args if given, first parameter is number of cubes vertically, second is number of cubes horizontally
+    * @param args if given, first parameter is the number of cubes vertically, second is the number of cubes horizontally
     */
   def main(args: Array[String]): Unit = {
-    val height = (if (args.length>0) args(0).toInt else 20) + 4
+    val height = if (args.length>0) args(0).toInt else 20 + 4
     val width = if (args.length>1) args(1).toInt else 10
+    println("----------------------------------------")
+    println("CONTROLS")
+    println("'a' for left")
+    println("'d' for right")
+    println("'s' for down")
+    println("'e' for rotation")
+    println("'q' for undo")
+    println("'r' for restart")
+    println("----------------------------------------")
+    println()
     start(width, height)
   }
 
@@ -91,7 +103,7 @@ object GameController{
       * Start the game loop
       */
     gameController.start
-    return (gameController, gameUI)
+    (gameController, gameUI)
   }
 }
 

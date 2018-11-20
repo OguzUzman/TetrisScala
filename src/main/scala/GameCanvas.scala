@@ -5,14 +5,15 @@ import scala.swing.{Graphics2D, Panel}
 /**
   * Created by oguz on 16.11.2018.
   */
-class GameCanvas(val height:Int, val width:Int, val cubeSize:Int) extends Panel{
+class GameCanvas(val height:Int, val width:Int, val cubeSize:Int) extends Panel with GameBoardObserver{
   preferredSize=new Dimension(width*cubeSize,height*cubeSize)
-  var gameBoardProvider:GameBoardProvider=_
+  GlobalReactors.addGameBoardListener(this)
   /**
     * Refresh the board UI
     * @param g
     */
   override def paint(g: Graphics2D): Unit = {
+    val gameBoardProvider:GameBoardProvider = GlobalReactors.gameBoardProvider
     if (gameBoardProvider == null) return
     for(y <- 0 until height; x <- 0 until width){
       var color = Color.BLACK
@@ -26,5 +27,5 @@ class GameCanvas(val height:Int, val width:Int, val cubeSize:Int) extends Panel{
     }
   }
 
-  def gameBoardProvider_(gameBoardProvider: GameBoardProvider)=this.gameBoardProvider=gameBoardProvider
+  override def onGameBoardUpdate(gameBoard: GameBoard): Unit = repaint
 }

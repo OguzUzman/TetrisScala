@@ -3,18 +3,18 @@
   */
 object GlobalReactors {
   private var _gameBoardListeners:List[GameBoardObserver]=List()
-  private var _gameControlListeners:List[GameControlListener]=List()
+  private var _gameControlObservers:List[GameControlListener]=List()
   private var _gameBoardProvider:GameBoardProvider=_
 
   def gameBoardObservers = _gameBoardListeners
-  def gameControlListeners = _gameControlListeners
+  def gameControlObservers = _gameControlObservers
   def gameBoardProvider = _gameBoardProvider
 
   def addGameBoardListener(gameBoardListener: GameBoardObserver) =
     _gameBoardListeners=gameBoardObservers:+gameBoardListener
 
   def addGameControlListener(gameControlListener: GameControlListener) =
-    _gameControlListeners = gameControlListeners:+ gameControlListener
+    _gameControlObservers = gameControlObservers:+ gameControlListener
 
   def gameBoardProvider_(gameBoardProvider: GameBoardProvider)=_gameBoardProvider = gameBoardProvider
 

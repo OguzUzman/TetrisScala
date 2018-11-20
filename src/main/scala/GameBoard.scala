@@ -5,17 +5,24 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
 
   private final val UNDO_COUNT : Int = 3
 
-  var board: Array[Array[Int]] = Array.ofDim(height + 4, width)
+  var board: Array[Array[Int]] = Array.ofDim(height, width)
   var _piece: Piece = _
   var pieceExists: Boolean = false
 
   val stateStack  = new QueueStack[GameState](UNDO_COUNT)
+  GlobalReactors.gameBoardProvider_(this)
+
+  // Getter
+  def piece = _piece
+
+  // Setter
+  def piece_= (newPiece:Piece):Unit = {_piece = newPiece; pieceExists=true}
 
   /**
     * Random piece at the top of the board horizontally center
     */
   def newRandomPiece: Unit = {
-    _piece = PieceGenerator.getRandom().yx_(0, (width - 2) / 2)
+    piece = PieceGenerator.getRandom().yx_(0, (width - 2) / 2)
     pieceExists = true
   }
 
@@ -24,21 +31,24 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     * Triggered on 'q'
     */
   def undo={
-    board = stateStack.pop._board
-    pieceExists = false
-    gameBoardChanged
+    if (stateStack.nonEmpty && !isGameOver) {
+      board = stateStack.pop._board
+      pieceExists = false
+      gameBoardChanged
+    }
   }
+
 
   /**
     * Fixes the piece onto the board.
     */
-  private def fix() = {
+  def fix() = {
     stateStack.push(new GameState(board.map(_.clone)))
     var copyMap = board.map(_.clone)
-    for (j <- 0 until _piece.size; i <- 0 until _piece.size) {
-      if (_piece.y + j < height && _piece.x + i < width && 0 <= _piece.y + j && 0 <= _piece.x + i) {
-        if (board(_piece.y + j)(_piece.x + i) == 1 || _piece.get(j, i) == 1) {
-          copyMap(_piece.y + j)(_piece.x + i) = 1
+    for (j <- 0 until piece.size; i <- 0 until piece.size) {
+      if (piece.y + j < height && piece.x + i < width && 0 <= piece.y + j && 0 <= piece.x + i) {
+        if (board(piece.y + j)(piece.x + i) == 1 || piece.get(j, i) == 1) {
+          copyMap(piece.y + j)(piece.x + i) = 1
         }
       }
     }
@@ -73,7 +83,7 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     * @return
     */
   def shiftAllowed(yShift: Int, xShift: Int): Boolean = {
-    val movedPiece = _piece.clone().yx_(_piece.y+yShift, _piece.x+xShift)
+    val movedPiece = piece.clone().yx_(piece.y+yShift, piece.x+xShift)
     pieceAllowed(movedPiece)
   }
 
@@ -85,8 +95,8 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     */
   def rotate(): Unit = {
     // Rotate piece only
-    val rotatedPiece = _piece.rotate
-    if (pieceAllowed(rotatedPiece)) {_piece = rotatedPiece; gameBoardChanged}
+    val rotatedPiece = piece.rotate
+    if (pieceAllowed(rotatedPiece)) {piece = rotatedPiece; gameBoardChanged}
   }
 
   /**
@@ -98,7 +108,7 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     */
   override def getCell(y: Int, x: Int): Int = {
     if (pieceExists)
-      getCell(y, x, _piece)
+      getCell(y, x, piece)
     else
       board(y)(x)
   }
@@ -112,6 +122,8 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     * @return
     */
   def getCell(y: Int, x: Int, pieceToTest:Piece):Int={
+    if (board(y)(x) == 1)
+      return 1
     if (pieceToTest==null)
       board(y)(x)
     if ((pieceToTest.y until (pieceToTest.y + pieceToTest.size()) contains y) &&
@@ -120,7 +132,7 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
         return 2
       }
     }
-    board(y)(x)
+    return 0
   }
 
 
@@ -135,11 +147,11 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
         val x = pieceHypothesis.x + i
         val y = pieceHypothesis.y + j
         if (y < 0 || x < 0 || y >= height || x >= width || getCell(y, x, pieceHypothesis) == 1) {
-          false
+          return false
         }
       }
     }
-    true
+    return true
   }
 
   /**
@@ -172,7 +184,7 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     * @return
     */
   def gameBoardChanged:AnyVal =
-    GlobalReactors.gameBoardObservers.foreach((observer: GameBoardObserver) => observer.onUpdate(this))
+    GlobalReactors.gameBoardObservers.foreach((observer: GameBoardObserver) => observer.onGameBoardUpdate(this))
 
 
   /**
@@ -181,7 +193,7 @@ class GameBoard(val height: Int, val width:Int) extends GameBoardProvider{
     * @param xShift
     */
   def movePiece(yShift:Int, xShift:Int)={
-    _piece.yx_(_piece.y + yShift, _piece.x + xShift)
+    piece.yx_(piece.y + yShift, piece.x + xShift)
     gameBoardChanged
   }
 }

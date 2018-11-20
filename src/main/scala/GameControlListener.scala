@@ -9,4 +9,5 @@ trait GameControlListener {
   def undo
   def rotate
   def newGame
+  def exit = System.exit(0)
 }
